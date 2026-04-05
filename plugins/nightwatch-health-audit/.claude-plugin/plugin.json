@@ -1,7 +1,7 @@
 {
   "name": "nightwatch-health-audit",
   "description": "Laravel Nightwatch health auditing with automatic Linear issue creation. Pulls exceptions, failed jobs, commands, scheduled tasks from Nightwatch MCP, compiles prioritized bug reports, and creates Linear issues for untracked bugs.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Vitalii Kotivskyi"
   },
