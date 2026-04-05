@@ -1,0 +1,15 @@
+{
+  "name": "plugin-writing-skill",
+  "description": "Guide for creating Cowork / Claude Code plugins from scratch — covers plugin.json, .mcp.json, skills, hooks, agents, and marketplace structure.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Vitalii Kotivskyi"
+  },
+  "keywords": [
+    "plugin",
+    "skill",
+    "cowork",
+    "claude-code",
+    "authoring"
+  ]
+}

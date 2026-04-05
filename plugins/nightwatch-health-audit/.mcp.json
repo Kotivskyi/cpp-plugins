@@ -1,0 +1,13 @@
+{
+  "nightwatch": {
+    "type": "http",
+    "url": "${NIGHTWATCH_MCP_URL}",
+    "headers": {
+      "Authorization": "Bearer ${NIGHTWATCH_API_TOKEN}"
+    }
+  },
+  "linear": {
+    "type": "http",
+    "url": "https://mcp.linear.app/mcp"
+  }
+}
