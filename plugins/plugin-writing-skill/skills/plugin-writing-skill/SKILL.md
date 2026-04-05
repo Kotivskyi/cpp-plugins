@@ -7,7 +7,77 @@ description: Use when creating a new Cowork / Claude Code plugin from scratch, p
 
 ## Overview
 
-A plugin is a distributable package that bundles **skills**, **MCP server configs**, **commands**, **hooks**, and **agents** for Claude Code (Cowork). Plugins extend Claude's capabilities and can be shared across projects and teams.
+A plugin is a distributable package that bundles **skills**, **MCP server configs**, **commands**, **hooks**, and **agents** for Claude Code (Cowork). Every plugin MUST be created inside a marketplace so it can be discovered and installed. The user's marketplace is **cpp-plugins** at `github:Kotivskyi/cpp-plugins`.
+
+## Marketplace Structure
+
+A marketplace is a git repo that indexes multiple plugins:
+
+```
+cpp-plugins/                          # Marketplace root
+├── .claude-plugin/
+│   └── marketplace.json              # REQUIRED: master index of all plugins
+├── plugins/
+│   ├── plugin-a/                     # Each plugin in its own directory
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── .mcp.json                 # Optional: MCP servers
+│   │   ├── skills/
+│   │   │   └── skill-name/
+│   │   │       └── SKILL.md
+│   │   └── README.md
+│   └── plugin-b/
+│       └── ...
+├── README.md
+└── LICENSE
+```
+
+## Publishing Checklist (MANDATORY)
+
+Every new plugin requires BOTH steps — a plugin without a marketplace entry is invisible:
+
+1. **Create the plugin** under `plugins/<plugin-name>/` with all required files
+2. **Register in marketplace.json** — add an entry to `.claude-plugin/marketplace.json` `plugins` array
+3. **Update marketplace README.md** — add the plugin to the plugins table
+4. **Commit and push** to the marketplace repo
+
+### marketplace.json Entry Format
+
+```json
+{
+  "name": "plugin-name",
+  "description": "What the plugin does — must match plugin.json description",
+  "source": "./plugins/plugin-name",
+  "category": "monitoring|development|productivity|integration"
+}
+```
+
+**Critical rules:**
+- `name` MUST match the directory name under `plugins/`
+- `name` MUST match `name` in the plugin's `.claude-plugin/plugin.json`
+- `source` MUST be a relative path: `"./plugins/<plugin-name>"`
+- `description` should match or closely align with the plugin.json description
+
+### Full marketplace.json Example
+
+```json
+{
+  "name": "cpp-plugins",
+  "description": "Claude Code plugins by Vitalii Kotivskyi",
+  "owner": {
+    "name": "Vitalii Kotivskyi",
+    "email": "vitalii@kotivskyi.dev"
+  },
+  "plugins": [
+    {
+      "name": "my-new-plugin",
+      "description": "What this plugin does",
+      "source": "./plugins/my-new-plugin",
+      "category": "development"
+    }
+  ]
+}
+```
 
 ## Plugin Directory Structure
 
@@ -25,7 +95,7 @@ plugin-name/
 │   └── hooks.json           # Event-driven hooks
 ├── agents/
 │   └── agent-name.md        # Agent definitions
-├── README.md                # Setup instructions
+├── README.md                # Setup instructions (required if MCP)
 └── LICENSE                  # License file
 ```
 
@@ -195,8 +265,12 @@ Every plugin with MCP servers needs a README covering:
 
 ## Common Mistakes
 
+- **Plugin not in marketplace.json** — plugin exists but nobody can find or install it. ALWAYS add to `.claude-plugin/marketplace.json`
+- **Name mismatch** — directory name, plugin.json `name`, marketplace.json `name`, and SKILL.md frontmatter `name` must all be consistent
 - **Missing `.claude-plugin/plugin.json`** — plugin won't be recognized
 - **Hardcoded secrets in `.mcp.json`** — always use `${ENV_VAR}` placeholders
 - **Wrong skill directory name** — must match the `name` field in SKILL.md frontmatter
 - **Forgetting README with MCP setup** — users won't know which tokens to configure
 - **Using `commands/` instead of `skills/`** — commands is legacy, prefer skills directory
+- **Forgetting to update marketplace README** — the plugins table in the marketplace root README must list all plugins
+- **Not pushing after adding plugin** — the marketplace is a git repo; changes must be committed and pushed to be available
