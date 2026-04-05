@@ -23,6 +23,7 @@ digraph audit_flow {
     rankdir=TB;
     node [shape=box];
 
+    preflight [label="0. Preflight: verify MCPs\nCheck nightwatch + linear connectivity"];
     discover [label="1. Discover application\nlist_applications"];
     parallel_fetch [label="2. Fetch ALL issue types in parallel\nexception, job, command,\nscheduled_task, route"];
     paginate [label="3. Paginate if next_cursor present\nRepeat until all pages fetched"];
@@ -32,6 +33,7 @@ digraph audit_flow {
     linear_dedup [label="7. Deduplicate against Linear\nSearch existing issues by title/exception"];
     linear_create [label="8. Create Linear issues\nFor unregistered bugs only"];
 
+    preflight -> discover;
     discover -> parallel_fetch;
     parallel_fetch -> paginate;
     paginate -> enrich;
@@ -43,6 +45,94 @@ digraph audit_flow {
 ```
 
 ## Step-by-Step
+
+### 0. Preflight: Verify MCP Connectivity
+
+**This step is mandatory. Do NOT skip it.** Before any audit work, verify that both required MCP servers are connected and responding.
+
+#### Check both MCPs in parallel:
+
+```
+mcp__nightwatch__list_applications()   # Tests Nightwatch connectivity
+mcp__linear__list_issues(query: "test") # Tests Linear connectivity (any lightweight call)
+```
+
+Fire both calls simultaneously. Then evaluate the results:
+
+#### Decision matrix:
+
+| Nightwatch | Linear | Action |
+|------------|--------|--------|
+| OK | OK | Proceed to Step 1 |
+| OK | FAILED | Proceed with audit (steps 1-6) but **skip Linear steps 7-8**. Warn: "Linear MCP is not connected — audit will run but issues won't be created in Linear." |
+| FAILED | OK | **STOP.** Cannot audit without Nightwatch. Guide user to fix (see below). |
+| FAILED | FAILED | **STOP.** Neither MCP is working. Guide user to fix both (see below). |
+
+#### What "FAILED" means:
+
+A call has failed if:
+- The tool doesn't exist (no `mcp__nightwatch__*` or `mcp__linear__*` tools available)
+- The call returns a connection error, auth error, or timeout
+- The response is an HTTP 401/403 (bad credentials)
+
+#### When Nightwatch MCP is missing or broken:
+
+Tell the user (keep it simple — they are not technical):
+
+> **I need to connect to Nightwatch first.** Please do this:
+>
+> 1. Open [nightwatch.laravel.com](https://nightwatch.laravel.com)
+> 2. Go to **Settings → MCP**
+> 3. Copy your **API token** and paste it here
+>
+> I'll handle the rest!
+
+Once the user provides the token, **you configure everything automatically:**
+
+1. Use the `update-config` skill (or directly write to `.claude/settings.json`) to add the Nightwatch MCP server config:
+   ```json
+   {
+     "nightwatch": {
+       "type": "http",
+       "url": "https://nightwatch.laravel.com/api/mcp",
+       "headers": {
+         "Authorization": "Bearer <TOKEN_FROM_USER>"
+       }
+     }
+   }
+   ```
+2. Tell the user: "All set! Please restart Claude Code (Cmd+R or close and reopen) and run this command again."
+
+**If the token is expired or invalid (401/403):**
+
+> Your Nightwatch token seems expired. Could you grab a fresh one?
+> Go to [nightwatch.laravel.com](https://nightwatch.laravel.com) → **Settings → MCP** → copy the token and paste it here.
+
+#### When Linear MCP is missing or broken:
+
+Tell the user:
+
+> **I also need Linear connected to create bug tickets.** This one's easy — no token needed.
+> Please restart Claude Code after I set it up. Linear will ask you to log in once.
+
+Then **configure it automatically:**
+
+1. Add the Linear MCP server config:
+   ```json
+   {
+     "linear": {
+       "type": "http",
+       "url": "https://mcp.linear.app/mcp"
+     }
+   }
+   ```
+2. Tell the user to restart Claude Code. Linear uses OAuth — it will prompt them to log in on first use.
+
+**If Linear returns an auth error:** Tell the user "Linear needs you to log in again. Please restart Claude Code — it will show a login prompt."
+
+**Only proceed to Step 1 once Nightwatch is confirmed working.**
+
+---
 
 ### 1. Discover the Application
 
@@ -230,6 +320,8 @@ mcp__linear__save_issue(
 
 ## Common Mistakes
 
+- **Skipping the preflight check** - ALWAYS verify MCP connectivity before doing any work. Failing mid-audit because Nightwatch isn't connected wastes time and confuses the user
+- **Proceeding after MCP failure** - If Nightwatch MCP fails, STOP and guide the user. Don't try to work around it
 - **Stopping at page 1** - Always check for `next_cursor` and paginate
 - **Not fetching details** - The list only shows titles; `get_issue` gives counts and stack traces needed for prioritization
 - **Sequential API calls** - All issue type fetches and detail fetches should be parallel
