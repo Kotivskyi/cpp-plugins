@@ -2,4 +2,4 @@
 
 ## Before Pushing to Main
 
-- Bump the plugin version in the relevant `plugin.json` before pushing to the `main` branch.
+- Bump the plugin version in both the relevant `plugin.json` and `.claude-plugin/marketplace.json` before pushing to the `main` branch.
