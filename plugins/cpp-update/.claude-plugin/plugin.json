@@ -1,0 +1,13 @@
+{
+  "name": "cpp-update",
+  "description": "One-command update for the cpp-plugins marketplace. Pulls latest plugins and reports what changed.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Vitalii Kotivskyi"
+  },
+  "keywords": [
+    "marketplace",
+    "update",
+    "cpp-plugins"
+  ]
+}

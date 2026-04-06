@@ -22,9 +22,16 @@
     },
     {
       "name": "marketplace-manager",
-      "description": "Marketplace lifecycle management for cpp-plugins — version bumping, registry validation, sync, and one-command marketplace updates.",
-      "version": "1.0.0",
+      "description": "Marketplace lifecycle management for cpp-plugins — version bumping, registry validation, and sync.",
+      "version": "1.0.1",
       "source": "./plugins/marketplace-manager",
+      "category": "development"
+    },
+    {
+      "name": "cpp-update",
+      "description": "One-command update for the cpp-plugins marketplace. Pulls latest plugins and reports what changed.",
+      "version": "1.0.0",
+      "source": "./plugins/cpp-update",
       "category": "development"
     }
   ]
