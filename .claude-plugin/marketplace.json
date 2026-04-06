@@ -19,6 +19,13 @@
       "version": "1.0.0",
       "source": "./plugins/plugin-writing-skill",
       "category": "development"
+    },
+    {
+      "name": "marketplace-manager",
+      "description": "Marketplace lifecycle management for cpp-plugins — version bumping, registry validation, sync, and one-command marketplace updates.",
+      "version": "1.0.0",
+      "source": "./plugins/marketplace-manager",
+      "category": "development"
     }
   ]
 }

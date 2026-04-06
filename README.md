@@ -8,6 +8,7 @@ A Claude Code (Cowork) plugin marketplace by Vitalii Kotivskyi.
 |--------|-------------|
 | [nightwatch-health-audit](plugins/nightwatch-health-audit/) | Laravel Nightwatch health auditing with automatic Linear issue creation |
 | [plugin-writing-skill](plugins/plugin-writing-skill/) | Guide for creating Cowork / Claude Code plugins from scratch |
+| [marketplace-manager](plugins/marketplace-manager/) | Marketplace lifecycle management — version bumping, validation, sync, and `/cpp-update` |
 
 ## Installation
 
@@ -22,6 +23,7 @@ claude /install-marketplace github:vkotivskiy/cpp-plugins
 ```bash
 claude /install nightwatch-health-audit@cpp-plugins
 claude /install plugin-writing-skill@cpp-plugins
+claude /install marketplace-manager@cpp-plugins
 ```
 
 ## Plugin Details
@@ -45,6 +47,14 @@ A reference skill that teaches Claude how to create new plugins. Covers:
 - Skills, hooks, agents, and commands
 - README best practices for MCP-dependent plugins
 
+### marketplace-manager
+
+Manages the cpp-plugins marketplace lifecycle:
+- **Version bumping** — bumps semver in both `plugin.json` and `marketplace.json`
+- **Validation** — checks name, description, version consistency across all plugins
+- **Registry sync** — detects unregistered plugins and adds them to the marketplace
+- **`/cpp-update`** — pulls the latest marketplace and reports what changed (works in Desktop/web app)
+
 ## Structure
 
 ```
@@ -59,11 +69,19 @@ cpp-plugins/
 │   │   └── skills/
 │   │       └── nightwatch-health-audit/
 │   │           └── SKILL.md
-│   └── plugin-writing-skill/      # Plugin authoring guide
+│   ├── plugin-writing-skill/      # Plugin authoring guide
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   └── skills/
+│   │       └── plugin-writing-skill/
+│   │           └── SKILL.md
+│   └── marketplace-manager/       # Marketplace lifecycle management
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       └── skills/
-│           └── plugin-writing-skill/
+│           ├── marketplace-manage/
+│           │   └── SKILL.md
+│           └── cpp-update/
 │               └── SKILL.md
 ├── README.md
 └── LICENSE

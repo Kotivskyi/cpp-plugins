@@ -1,0 +1,15 @@
+{
+  "name": "marketplace-manager",
+  "description": "Marketplace lifecycle management for cpp-plugins — version bumping, registry validation, sync, and one-command marketplace updates.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Vitalii Kotivskyi"
+  },
+  "keywords": [
+    "marketplace",
+    "versioning",
+    "registry",
+    "plugin-management",
+    "cpp-plugins"
+  ]
+}
